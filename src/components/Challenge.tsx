@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -61,26 +60,31 @@ export default function Challenge({ id, title, description, points, category }: 
       
       <CardHeader>
         <div className="flex justify-between items-center">
-          <CardTitle className="text-xl font-bold text-white">{title}</CardTitle>
+          <CardTitle className="text-xl font-bold text-white">
+            The Ransomware Incident
+          </CardTitle>
           <Badge className="bg-ctf-blue text-white">{points} pts</Badge>
         </div>
         <Badge variant="outline" className="w-fit text-gray-400 border-gray-700">
           {category}
         </Badge>
         <CardDescription className="text-gray-400 mt-2">
-          {description}
+          A small business employee accidentally ran a ransomware executable (<span className="font-mono">malware.exe</span>). Critical files were encrypted, but the attacker left behind traces. As a DFIR (Digital Forensics &amp; Incident Response) team, you must analyze the disk, recover the encrypted files, and find the hidden flag (split into 3 parts).
         </CardDescription>
       </CardHeader>
       
       <CardContent className="terminal-text bg-black/40 p-4 rounded-md border border-gray-800 text-green-400 text-sm">
-        <p className="mb-2">$ ls -la evidence/</p>
-        <p>drwxr-xr-x 2 root root 4096 May 9 08:14 .</p>
-        <p>drwxr-xr-x 3 root root 4096 May 9 08:12 ..</p>
-        <p>-rw-r--r-- 1 root root 2048 May 9 08:13 memory.dump</p>
-        <p>-rw-r--r-- 1 root root 1024 May 9 08:13 network.pcap</p>
-        <p>-rw-r--r-- 1 root root 3072 May 9 08:14 system.log</p>
-        <p className="mb-2">$ cat system.log | grep 'suspicious'</p>
-        <p className="text-yellow-400">Hint: The flag format is MED{"{something}"}...</p>
+        <p className="mb-2">$ ls -la disk/</p>
+        <p>drwxr-xr-x 3 user user 4096 May 10 09:00 .</p>
+        <p>drwxr-xr-x 5 user user 4096 May 10 08:59 ..</p>
+        <p>-rw-r--r-- 1 user user 8192 May 10 09:01 malware.exe</p>
+        <p>-rw-r--r-- 1 user user 4096 May 10 09:02 important.docx.encrypted</p>
+        <p>-rw-r--r-- 1 user user 4096 May 10 09:02 finances.xlsx.encrypted</p>
+        <p>-rw-r--r-- 1 user user 2048 May 10 09:03 ransom_note.txt</p>
+        <p className="mb-2">$ cat ransom_note.txt</p>
+        <p className="text-red-400">Your files have been encrypted! Find the key to recover them.</p>
+        <p className="mb-2">$ strings malware.exe | grep FLAG</p>
+        <p className="text-yellow-400">Hint: The flag is split into 3 parts. Format: MED&#123;part1_part2_part3&#125;</p>
       </CardContent>
       
       <CardFooter className="pt-4">
