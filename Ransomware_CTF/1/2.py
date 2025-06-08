@@ -7,7 +7,7 @@ password = "weakpass123"  # Weak password
 key = pad(password.encode(), AES.block_size)  # Derive key
 cipher = AES.new(key, AES.MODE_ECB)
 
-plaintext = "FLAG_PART_2: File_Carving_Pro"
+plaintext = "FLAG_PART_2: File_Carving_Pro_"
 
 # Encrypt
 encrypted = cipher.encrypt(pad(plaintext.encode(), AES.block_size))

@@ -3,14 +3,14 @@
 # Creates a disk image with the CTF challenge files
 
 # Set the size of the disk image (500MB)
-IMAGE_SIZE="500M"
+IMAGE_SIZE="100M"
 IMAGE_NAME="ransomware_ctf_disk.img"
 MOUNT_POINT="/mnt/ctf_image"
 
 echo "Creating disk image for CTF challenge..."
 
 # Create a blank disk image
-dd if=/dev/zero of=$IMAGE_NAME bs=1M count=500
+dd if=/dev/zero of=$IMAGE_NAME bs=1M count=100
 
 # Create a filesystem on the image
 mkfs.ext4 $IMAGE_NAME

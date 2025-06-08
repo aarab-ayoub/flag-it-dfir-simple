@@ -4,7 +4,7 @@ import os
 def xor_encrypt(text, key):
     return bytes([b ^ key for b in text.encode()])
 
-text = "FLAG_PART_1: MED{Metadata_Expert"
+text = "FLAG_PART_1: MED{Metadata_Expert_"
 key = 0x4A  # Simple key (hex)
 
 # Encrypt the flag
