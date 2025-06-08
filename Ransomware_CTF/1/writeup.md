@@ -13,6 +13,12 @@ Using FTK Imager:
 2. File > Add Evidence Item > Select "Image File" > Navigate to `ransomware_ctf_disk.img`
 3. Explore the disk structure
 
+You can also use command-line tools to analyze the disk:
+```bash
+# List all files in the disk image
+sudo fls ransomware_ctf_disk.img
+```
+
 ### Step 2: Analyze the Encrypted Files
 
 Three encrypted files are found in the `/important_files` directory:
@@ -42,46 +48,79 @@ plaintext = xor_decrypt(ciphertext, 0x4A)
 print(plaintext.decode('utf-8'))
 ```
 
-Result: `FLAG_PART_1: MED{Metadata_Expert`
+Result: `FLAG_PART_1: MED{Metadata_Expert_`
 
 ### Step 4: Recover Flag Part 2 (AES Encryption)
 
-1. Look for deleted files using file carving tools:
-   ```
-   foremost -i ransomware_ctf_disk.img -o recovered_files
-   ```
-   
-2. Find the deleted `.aes_hint.tmp` file which contains the password: `weakpass123`
+1. Look for the password using multiple forensic methods:
 
-3. Decrypt the AES encrypted file:
+   ```bash
+   # Method 1: Search for deleted files
+   sudo fls -rd ransomware_ctf_disk.img
+   
+   # Method 2: Use file carving to recover deleted files
+   sudo foremost -t txt -i ransomware_ctf_disk.img -o recovered_files
+   
+   # Method 3: Search for strings containing "password" or "weak"
+   sudo strings ransomware_ctf_disk.img | grep -i "HINT_WEAK"
+   ```
+
+2. Find the password "weakpass123" hidden in the disk:
+   - It can be found using strings: `HINT_WEAKPASS123_HINT`
+   - Or in a deleted file `.aes_hint.tmp`
+
+3. Decrypt the AES encrypted file using the same padding and key derivation method as the encryption:
+
    ```python
    from Crypto.Cipher import AES
-   from Crypto.Util.Padding import unpad
+   from Crypto.Util.Padding import unpad, pad
    
+   # Use the exact same key derivation as in the encryption
    password = "weakpass123"
-   key = password.encode().ljust(16, b'\0')[:16]  # Pad to 16 bytes
+   key = pad(password.encode(), AES.block_size)
+   
+   # Create cipher object with ECB mode
    cipher = AES.new(key, AES.MODE_ECB)
    
    with open("flag2.txt.enc", "rb") as f:
        ciphertext = f.read()
    
-   plaintext = unpad(cipher.decrypt(ciphertext), AES.block_size)
-   print(plaintext.decode('utf-8'))
+   # Decrypt and unpad
+   decrypted = unpad(cipher.decrypt(ciphertext), AES.block_size)
+   print(decrypted.decode('utf-8'))
    ```
 
-Result: `FLAG_PART_2: File_Carving_Pro`
+Result: `FLAG_PART_2: File_Carving_Pro_`
 
 ### Step 5: Recover Flag Part 3 (Hybrid Encryption)
 
-1. The PDF is encrypted with AES, and the AES key is encrypted with RSA
-2. Need to find the RSA private key hidden in slack space
-3. Use `sleuthkit` tools to examine slack space:
-   ```
-   fls -r ransomware_ctf_disk.img
-   icat -s ransomware_ctf_disk.img [inode_of_decoy.txt] > recovered_key.pem
-   ```
+1. The PDF is encrypted with a hybrid encryption scheme:
+   - The PDF data is encrypted with AES
+   - The AES key is encrypted with RSA
+   - Need to find the RSA private key to decrypt
+
+2. Look for the RSA private key hidden in slack space:
+
+   ```bash
+   # Find the decoy.txt file
+   sudo fls ransomware_ctf_disk.img | grep -i "decoy"
    
+   # Extract the slack space from decoy.txt (replace XX with the inode number)
+   sudo icat ransomware_ctf_disk.img XX > recovered_key.pem
+   
+   # Check if it contains the private key
+   strings recovered_key.pem | grep "BEGIN RSA PRIVATE KEY"
+   ```
+
+3. Alternatively, search for the private key directly:
+
+   ```bash
+   # Search for the RSA private key header
+   sudo strings ransomware_ctf_disk.img | grep -A 5 "BEGIN RSA PRIVATE KEY"
+   ```
+
 4. Decrypt the PDF using the recovered private key:
+
    ```python
    from Crypto.Cipher import AES, PKCS1_OAEP
    from Crypto.PublicKey import RSA
@@ -132,3 +171,14 @@ Final Flag: `MED{Metadata_Expert_File_Carving_Pro_Slack_Space_Hunter}`
 - Foremost/Scalpel: For file carving
 - Sleuthkit (fls, icat): For filesystem analysis
 - Python with PyCryptodome: For decryption operations
+- String analysis tools: `strings`, `grep` for finding hidden information
+
+## Learning Outcomes
+
+This challenge teaches several important skills in digital forensics:
+
+1. **Metadata examination**: Looking for clues in file names and headers
+2. **File recovery**: Finding and recovering deleted files from disk images
+3. **Advanced data hiding**: Discovering data hidden in slack space
+4. **Cryptographic analysis**: Understanding and breaking different encryption methods
+5. **Forensic tooling**: Using industry-standard forensic tools

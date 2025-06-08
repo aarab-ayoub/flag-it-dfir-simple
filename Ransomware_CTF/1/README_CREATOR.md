@@ -38,10 +38,10 @@ To create this challenge, you'll need:
    ```
 
    This will:
-   - Create a 500MB disk image file named `ransomware_ctf_disk.img`
+   - Create a 100MB disk image file named `ransomware_ctf_disk.img`
    - Format it with ext4 filesystem
    - Add the encrypted files and decoy files
-   - Hide the AES password in a deleted file
+   - Hide the AES password in a deleted file and in strings
    - Hide the RSA private key in slack space
    - Add a ransomware note
 
@@ -52,9 +52,9 @@ To create this challenge, you'll need:
 1. Provide the `ransomware_ctf_disk.img` file to the participants
 2. Include the challenge description:
    ```
-   A small business employee accidentally ran a ransomware executable.
-   Critical files were encrypted, but the attacker left behind traces.
-   As a DFIR team, analyze the disk, recover the encrypted files, and find the hidden flag (split into 3 parts).
+   A small business employee accidentally ran a ransomware executable. Critical files were encrypted, 
+   but the attacker left behind traces. As a DFIR team, analyze the disk, recover the encrypted files,
+   and find the hidden flag (split into 3 parts).
    ```
 
 ## Solution
@@ -68,8 +68,30 @@ The complete flag is: `MED{Metadata_Expert_File_Carving_Pro_Slack_Space_Hunter}`
 ## Notes for Instructors
 
 - If participants get stuck on the XOR part, hint that they should look at the filename and file content
-- For the AES part, hint about file carving tools like Foremost or Scalpel
-- For the PDF part, suggest looking into slack space with tools like Sleuthkit
+- For the AES part, hint about looking for strings with "hint" or "password" in the disk image
+- For the PDF part, suggest examining slack space of the decoy.txt file
+
+## Files in This Challenge
+
+- **Encryption Scripts**:
+  - `1.py` - XOR encryption for flag1
+  - `2.py` - AES encryption for flag2
+  - `3.py` - Hybrid encryption for flag3.pdf
+
+- **Decryption Scripts** (Solution):
+  - `1_decrypt.py` - XOR decryption
+  - `2_decrypt.py` - AES decryption
+  - `3_decrypt.py` - Hybrid decryption for PDF
+
+- **Challenge Creation**:
+  - `create_disk_image.sh` - Creates the disk image with all files
+  - `writeup.md` - Solution guide
+  - `README_CREATOR.md` - This file
+
+- **Encrypted Files**:
+  - `flag1_0x4A.txt.enc`
+  - `flag2.txt.enc`
+  - `flag3.pdf.enc`
 
 ## Customization
 

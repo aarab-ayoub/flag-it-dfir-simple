@@ -1,51 +1,40 @@
-# decrypt_aes.py
+# decrypt_aes.py - AES decryption for flag2
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import unpad
+from Crypto.Util.Padding import unpad, pad
 
-def decrypt_aes(encrypted_file, password, output_file=None):
+def decrypt_flag2():
     """
-    Decrypt AES encrypted file using the provided password.
-    
-    Args:
-        encrypted_file (str): Path to the encrypted file
-        password (str): Password used for encryption
-        output_file (str, optional): Output file path for decrypted content
+    Decrypt flag2.txt.enc using the correct AES key derivation method.
     """
-    # Derive key from password
-    key = password.encode()
-    # Pad the key to AES block size if needed
-    key = key.ljust(16, b'\0')[:16]
+    # Password known from the disk image forensics
+    password = "weakpass123"
     
-    # Create cipher
-    cipher = AES.new(key, AES.MODE_ECB)
+    # Use the exact same key derivation as in the encryption script
+    key = pad(password.encode(), AES.block_size)
     
-    # Read encrypted data
-    with open(encrypted_file, 'rb') as f:
-        ciphertext = f.read()
-    
-    # Decrypt
     try:
-        plaintext = unpad(cipher.decrypt(ciphertext), AES.block_size)
+        with open('flag2.txt.enc', 'rb') as f:
+            encrypted_data = f.read()
         
-        # Save to file if output_file is provided
-        if output_file:
-            with open(output_file, 'wb') as f:
-                f.write(plaintext)
+        # Create cipher object with ECB mode (same as encryption)
+        cipher = AES.new(key, AES.MODE_ECB)
         
-        return plaintext.decode('utf-8')
+        # Decrypt and unpad
+        decrypted = unpad(cipher.decrypt(encrypted_data), AES.block_size)
+        
+        print("Successfully decrypted flag2.txt.enc!")
+        print(decrypted.decode('utf-8'))
+        return True
+            
     except Exception as e:
-        return f"Decryption error: {str(e)}"
+        print(f"Error during decryption: {e}")
+        return False
 
 if __name__ == "__main__":
-    passwords_to_try = ["weakpass123", "123456", "password", "admin"]
+    print("Flag 2 Decryption Tool - AES")
+    print("-----------------------------")
+    print("This password was found through forensic analysis of the disk image")
+    print("using strings command or file carving tools.")
+    print("\nAttempting to decrypt flag2.txt.enc with password 'weakpass123'...")
     
-    for password in passwords_to_try:
-        print(f"Trying password: {password}")
-        result = decrypt_aes('flag2.txt.enc', password)
-        if "FLAG_PART_2" in result:
-            print("Success! Decrypted content:")
-            print(result)
-            break
-    else:
-        print("Could not decrypt with the tried passwords.")
-        print("Hint: The password is in a deleted .hint file. Use file carving tools.")
+    decrypt_flag2()

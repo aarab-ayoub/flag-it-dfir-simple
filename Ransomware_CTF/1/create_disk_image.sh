@@ -63,25 +63,55 @@ EOL
 sudo cp notes.txt $MOUNT_POINT/work/
 
 # Add the hint file for AES decryption (will be deleted but recoverable)
-echo "Password: weakpass123" | sudo tee $MOUNT_POINT/.aes_hint.tmp > /dev/null
+# Create a more substantial file to ensure it remains recoverable
+cat > aes_hint.txt << EOL
+==== SECURITY NOTE ====
+This file contains sensitive information and should be deleted after use.
+DO NOT SHARE THIS INFORMATION!
+
+Password for encrypted files: weakpass123
+
+Date: June 8, 2025
+EOL
+
+# Copy it to the image with a hidden name
+sudo cp aes_hint.txt $MOUNT_POINT/.aes_hint.tmp
+
+# Create a substantial amount of additional files to prevent overwriting
+for i in {1..10}; do
+    echo "Dummy file $i" | sudo tee $MOUNT_POINT/dummy_file_$i > /dev/null
+done
+
+# Now delete the hint file (but it should remain recoverable with file carving)
 sudo rm $MOUNT_POINT/.aes_hint.tmp
+
+# Write the string directly into the disk to ensure it can be found with strings
+echo "HINT_WEAKPASS123_HINT" | sudo dd of=$MOUNT_POINT/personal/notes.txt conv=notrunc
 
 # Add the private key to slack space
 echo "Hiding RSA private key in slack space..."
-# Get a block from the mounted filesystem
-BLOCK_SIZE=4096
-sudo dd if=private_key.pem of=$MOUNT_POINT/slack_space.tmp bs=1 count=$BLOCK_SIZE
+
+# First method: Use file slack space
 # Create a small file to have slack space
 echo "This is just a decoy file" | sudo tee $MOUNT_POINT/decoy.txt > /dev/null
-# Remove the temporary file but the data remains in slack space
-sudo rm $MOUNT_POINT/slack_space.tmp
+
+# Append the private key after the file end marker to simulate slack space
+cat private_key.pem | sudo dd of=$MOUNT_POINT/decoy.txt bs=1 seek=24 conv=notrunc
+
+# Second method: Create a file with the private key in a hidden directory and then delete it
+sudo mkdir -p $MOUNT_POINT/.hidden_data
+sudo cp private_key.pem $MOUNT_POINT/.hidden_data/rsa_key.pem
+sudo rm $MOUNT_POINT/.hidden_data/rsa_key.pem
+
+# Create the file with unallocated space that contains part of the key
+echo "-----BEGIN RSA PRIVATE KEY-----" | sudo tee $MOUNT_POINT/key_hint.txt > /dev/null
 
 # Unmount the image
 echo "Finalizing disk image..."
-sudo umount $MOUNT_POINT
+sudo umount $MOUNT_POINT || echo "Note: already unmounted"
 
 echo "Disk image created: $IMAGE_NAME"
 echo "This disk image can now be analyzed with FTK Imager or other forensic tools."
 
 # Cleanup
-rm -f ransom_note.txt notes.txt
+rm -f ransom_note.txt notes.txt aes_hint.txt
