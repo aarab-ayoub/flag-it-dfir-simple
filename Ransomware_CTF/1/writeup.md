@@ -154,7 +154,8 @@ Result: `FLAG_PART_2: File_Carving_Pro_`
 ### Step 6: Combine the Flag Parts
 
 Final Flag: `MED{Metadata_Expert_File_Carving_Pro_Slack_Space_Hunter}`
-
+submit the flag here and see if u did decrypt the flag  right 
+     -> https://flag-it-dfir-simple.vercel.app/home 
 ## Techniques Demonstrated
 
 1. **File Metadata Analysis**: Finding the XOR key in the filename and file content
