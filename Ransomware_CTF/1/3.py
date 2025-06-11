@@ -5,7 +5,7 @@ from Crypto.Random import get_random_bytes
 import os
 
 # Generate RSA keys (weak for CTF)
-private_key = RSA.generate(1024)  # Weak key for demo
+private_key = RSA.generate(1024) 
 public_key = private_key.publickey()
 
 # Encrypt PDF with AES
@@ -16,6 +16,20 @@ with open("flag3.pdf", "rb") as f:
 ciphertext, tag = cipher_aes.encrypt_and_digest(pdf_data)
 
 # Encrypt AES key with RSA
+
+# Why PKCS1_OAEP is Important
+# Raw RSA encryption has several vulnerabilities:
+
+# Deterministic output: Encrypting the same message twice produces identical ciphertexts
+# Mathematical patterns: Pure RSA can leak information about the plaintext
+# Malleability: An attacker might modify ciphertexts in meaningful ways
+# How PKCS1_OAEP Works
+# PKCS1_OAEP adds randomness and complexity to RSA encryption:
+
+# It applies a random padding to the message
+# Uses hash functions to mix the data thoroughly
+# Ensures that encrypting the same data multiple times produces different ciphertexts
+
 cipher_rsa = PKCS1_OAEP.new(public_key)
 encrypted_aes_key = cipher_rsa.encrypt(aes_key)
 
