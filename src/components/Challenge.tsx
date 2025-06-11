@@ -70,6 +70,21 @@ export default function Challenge({ id, title, description, points, category }: 
         </Badge>
         <CardDescription className="text-gray-400 mt-2">
           A small business employee accidentally ran a ransomware executable (<span className="font-mono">malware.exe</span>). Critical files were encrypted, but the attacker left behind traces. As a DFIR (Digital Forensics &amp; Incident Response) team, you must analyze the disk, recover the encrypted files, and find the hidden flag (split into 3 parts).
+          <div className="mt-2">
+            <a 
+              href="https://www.mediafire.com/file/cjjbto69pzvga3w/ransomware_ctf_disk.img/file" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-ctf-blue hover:underline flex items-center gap-1"
+            >
+              <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download Disk Image
+            </a>
+          </div>
         </CardDescription>
       </CardHeader>
       
