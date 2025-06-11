@@ -29,7 +29,7 @@ export default function Challenge({ id, title, description, points, category }: 
     
     // Check if flag is correct
     setTimeout(() => {
-      const correctFlag = "MED{Metadata_Expert_File_Carving_Pro_Slack_Space_Hunter}";
+      const correctFlag = "MED{Metadata_Expert_File_Carving_Pro_PDF_Expert_123}";
       
       if (flag === correctFlag) {
         // Mark as solved
